@@ -1,0 +1,8 @@
+#This File allows system adminstrators to configure the netdump-server service.
+#Specifically it allows the sysadmin to specify the options to pass to the
+#netdump-server binary, as specified in the netdump-server(8) man page. 
+#NOTE: passing the --daemon option is not necessecary as the service startup
+#script allready apends it
+
+#Uncomment the next line to list options to specify for netdump-server
+#SERVER_OPTS=""

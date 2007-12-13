@@ -1,0 +1,40 @@
+--- netdump-0.7.16/netdump-server.init.orig	2007-02-13 10:52:37.000000000 -0500
++++ netdump-0.7.16/netdump-server.init	2007-02-13 10:54:18.000000000 -0500
+@@ -14,12 +14,15 @@
+ 
+ [ -f /usr/sbin/netdump-server ] || exit 1
+ 
++[ -f /etc/sysconfig/netdump-server ] || exit 0
++. /etc/sysconfig/netdump-server
++
+ RETVAL=0
+ 
+ start(){
+ 	# Start daemons.
+ 	echo -n "Starting netdump server: "
+-	daemon --user netdump /usr/sbin/netdump-server --daemon
++	daemon --user netdump /usr/sbin/netdump-server --daemon $SERVER_OPTS
+ 	RETVAL=$?
+ 	echo
+ 	touch /var/lock/subsys/netdump-server
+--- netdump-0.7.16/netdump-server.8.orig	2007-02-13 10:48:01.000000000 -0500
++++ netdump-0.7.16/netdump-server.8	2007-02-13 10:49:42.000000000 -0500
+@@ -24,6 +24,7 @@
+ .B \ \ \ \ \ \ \ \ \ [--addr \fIaddress\fP]
+ .B \ \ \ \ \ \ \ \ \ [--concurrent \fInumber\fP]
+ .B \ \ \ \ \ \ \ \ \ [--pidfile \fIpath\fP]
++.B \ \ \ \ \ \ \ \ \ [--dumpdir \fIpath\fP]
+ .B \ \ \ \ \ \ \ \ \ [--daemon]
+ .B \ \ \ \ \ \ \ \ \ [--secure <\fI0|1\fP>]
+ .B \ \ \ \ \ \ \ \ \ [--help] [--usage]
+@@ -51,6 +52,10 @@
+ time. If more clients than the specified maximum connects at one time
+ the last ones will just be logged and then rebooted.
+ .TP
++--dumpdir \fIpath\fP
++Specify the location where received vmcore files are saved.  Defaults to
++/var/crash
++.TP
+ --pidfile \fIpath\fP
+ Store a pidfile.  The default service uses /var/run/netdump-server.pid.
+ The default is not to write a pidfile.

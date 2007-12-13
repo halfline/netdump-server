@@ -1,0 +1,21 @@
+diff -up netdump-0.7.16/netdump.init.orig netdump-0.7.16/netdump.init
+--- netdump-0.7.16/netdump.init.orig	2007-12-03 12:57:37.000000000 -0500
++++ netdump-0.7.16/netdump.init	2007-12-03 12:58:11.000000000 -0500
+@@ -219,7 +219,7 @@ start ()
+     	    NETDUMPOPTS="magic1=0x11111111 magic2=0x11111111 "
+     	    ;;
+         *)
+-    	    ssh -x -i /etc/sysconfig/netdump_id_dsa netdump@$NETDUMPADDR echo "$MAGIC2$MAGIC1" \> /var/crash/magic/$LOCALADDR
++    	    ssh -x -i /etc/sysconfig/netdump_id_dsa netdump@$NETDUMPADDR echo "$MAGIC2$MAGIC1" \> /var/netdump/crash/magic/$LOCALADDR
+     	    if [ $? -ne 0 ]; then
+     		echo "$prog: could not ssh to server $NETDUMPADDR"
+     		netdump_failure "netdump server ssh key exchange"
+@@ -404,7 +404,7 @@ propagate ()
+ {
+     # propagate netdump ssh public key to the crashdump server
+     cat /etc/sysconfig/netdump_id_dsa.pub | \
+-	ssh -x netdump@$NETDUMPADDR cat '>>' /var/crash/.ssh/authorized_keys2
++	ssh -x netdump@$NETDUMPADDR cat '>>' /var/netdump/crash/.ssh/authorized_keys2
+ }
+ 
+ case "$1" in

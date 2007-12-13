@@ -1,0 +1,29 @@
+diff -up netdump-0.7.16/Makefile.orig netdump-0.7.16/Makefile
+--- netdump-0.7.16/Makefile.orig	2007-12-03 13:00:11.000000000 -0500
++++ netdump-0.7.16/Makefile	2007-12-03 13:02:38.000000000 -0500
+@@ -1,6 +1,5 @@
+ DEBUG_FLAGS=-Wall -g
+ 
+-CFLAGS=`glib-config --cflags` $(DEBUG_FLAGS) -D_FILE_OFFSET_BITS=64
+ LDFLAGS=`glib-config --libs` -lpopt
+ 
+ VERSION=$(shell awk '/Version:/ { print $$2 }' netdump.spec)
+@@ -21,12 +20,12 @@ netdump-server: server.o netdumpclient.o
+ 	gcc -o netdump-server server.o netdumpclient.o configuration.o $(LDFLAGS)
+ 
+ install: netdump-server
+-	mkdir -p $(DESTDIR)/var/crash
+-	mkdir -p $(DESTDIR)/var/crash/scripts
+-	mkdir -m 700 -p $(DESTDIR)/var/crash/magic
+-	mkdir -m 700 -p $(DESTDIR)/var/crash/.ssh
+-	touch $(DESTDIR)/var/crash/.ssh/authorized_keys2
+-	chmod u=rw,go= $(DESTDIR)/var/crash/.ssh/authorized_keys2
++	mkdir -p $(DESTDIR)/var/netdump/crash
++	mkdir -p $(DESTDIR)/var/netdump/crash/scripts
++	mkdir -m 700 -p $(DESTDIR)/var/netdump/crash/magic
++	mkdir -m 700 -p $(DESTDIR)/var/netdump/crash/.ssh
++	echo "#netdump stores client keys here" > $(DESTDIR)/var/netdump/crash/.ssh/authorized_keys2
++	chmod u=rw,go= $(DESTDIR)/var/netdump/crash/.ssh/authorized_keys2
+ 	mkdir -p $(DESTDIR)/usr/sbin
+ 	mkdir -p $(DESTDIR)/etc/sysconfig
+ 	mkdir -p $(DESTDIR)/etc/rc.d/init.d

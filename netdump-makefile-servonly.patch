@@ -1,0 +1,18 @@
+diff -up netdump-0.7.16/Makefile.orig netdump-0.7.16/Makefile
+--- netdump-0.7.16/Makefile.orig	2005-03-01 12:33:03.000000000 -0500
++++ netdump-0.7.16/Makefile	2007-11-12 15:47:45.000000000 -0500
+@@ -31,14 +31,10 @@ install: netdump-server
+ 	mkdir -p $(DESTDIR)/etc/sysconfig
+ 	mkdir -p $(DESTDIR)/etc/rc.d/init.d
+ 	cp netdump-server $(DESTDIR)/usr/sbin
+-	cp netdump.sysconfig $(DESTDIR)/etc/sysconfig/netdump
+-	cp netdump.init $(DESTDIR)/etc/rc.d/init.d/netdump
+-	chmod a+x $(DESTDIR)/etc/rc.d/init.d/netdump
+ 	cp netdump-server.init $(DESTDIR)/etc/rc.d/init.d/netdump-server
+ 	chmod a+x $(DESTDIR)/etc/rc.d/init.d/netdump-server
+ 	mkdir -p $(DESTDIR)/usr/share/man/man8
+ 	cp netdump-server.8 $(DESTDIR)/usr/share/man/man8
+-	cp netdump.8 $(DESTDIR)/usr/share/man/man8
+ 
+ 
+ tag-archive:

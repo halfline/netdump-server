@@ -1,0 +1,72 @@
+--- netdump-0.7.16/server.c.orig	2006-01-23 14:37:11.000000000 -0500
++++ netdump-0.7.16/server.c	2006-07-14 14:52:04.000000000 -0400
+@@ -70,7 +70,7 @@ get_dir_from_ip (guint32 ip, gboolean cr
+       dir = g_new (CrashDir, 1);
+       dir->time = now;
+       dir->path = g_strdup_printf ("%s/%d.%d.%d.%d-%s",
+-				   NETDUMP_DIR_PREFIX,
++				   config.dir_prefix,
+ 				   (ip >> 24) & 0xff,
+ 				   (ip >> 16) & 0xff,
+ 				   (ip >> 8) & 0xff,
+@@ -122,7 +122,7 @@ execute_script (const char *script,
+   char *cmdline;
+   int res = -1;
+ 
+-  filename = g_strconcat (NETDUMP_DIR_PREFIX "/scripts/",
++  filename = g_strconcat (config.dir_prefix, "/scripts/",
+ 			  script,
+ 			  NULL);
+   
+@@ -169,7 +169,7 @@ load_magic (guint32 ip, guchar magic[MAG
+     }
+ 
+   path = g_strdup_printf ("%s/magic/%d.%d.%d.%d",
+-			 NETDUMP_DIR_PREFIX,
++			 config.dir_prefix,
+ 			 (ip >> 24) & 0xff,
+ 			 (ip >> 16) & 0xff,
+ 			 (ip >> 8) & 0xff,
+@@ -413,10 +413,10 @@ main (int argc, char *argv[])
+ 
+   openlog("netdump", LOG_PID, LOG_DAEMON);
+ 
+-  if (chdir (NETDUMP_DIR_PREFIX) == -1)
++  if (chdir (config.dir_prefix) == -1)
+     {
+-      syslog (LOG_ERR, "can't cd to %s", NETDUMP_DIR_PREFIX);
+-      fprintf (stderr, "can't cd to %s", NETDUMP_DIR_PREFIX);
++      syslog (LOG_ERR, "can't cd to %s", config.dir_prefix);
++      fprintf (stderr, "can't cd to %s", config.dir_prefix);
+       exit (1);
+     }
+   
+--- netdump-0.7.16/configuration.h.orig	2006-01-23 14:37:11.000000000 -0500
++++ netdump-0.7.16/configuration.h	2006-07-14 14:52:04.000000000 -0400
+@@ -14,6 +14,7 @@ typedef struct {
+   char *compress;
+   int skip_zero;
+   int debug;
++  char *dir_prefix;
+ } NetdumpConfiguration;
+ 
+ extern NetdumpConfiguration config;
+--- netdump-0.7.16/configuration.c.orig	2006-01-23 14:37:11.000000000 -0500
++++ netdump-0.7.16/configuration.c	2006-07-14 15:13:05.000000000 -0400
+@@ -46,6 +46,7 @@ struct ConfigData config_data[] =
+   { "addr", CONFIG_STRING, CONFIG_OFFSET(addr), NULL },
+   { "max_concurrent_dumps", CONFIG_INT, CONFIG_OFFSET(max_concurrent_dumps), GINT_TO_POINTER (4) },
+   { "daemon", CONFIG_BOOLEAN, CONFIG_OFFSET(daemon), GINT_TO_POINTER (0) },
++  { "dumpdir", CONFIG_STRING, CONFIG_OFFSET(dir_prefix), NETDUMP_DIR_PREFIX },
+   { "pidfile", CONFIG_STRING, CONFIG_OFFSET(pidfile), NULL },
+   { "secure", CONFIG_INT, CONFIG_OFFSET(secure), GINT_TO_POINTER (1) },
+   { "space_check", CONFIG_INT, CONFIG_OFFSET(space_check), GINT_TO_POINTER (1) },
+@@ -278,6 +279,8 @@ static struct poptOption optionsTable[] 
+       "ip port to listen on", "6666" },
+     { "addr", 'a', POPT_ARG_STRING, &config.addr, 0,
+       "ip address to bind server to", "any" },
++    { "dumpdir", 'C', POPT_ARG_STRING, &config.dir_prefix, 'C',
++      "directory to store dumps", "directory" },
+     { "concurrent", 'c', POPT_ARG_INT, &config.max_concurrent_dumps, 0,
+       "max number of concurrent dumps", "4" },
+     { "daemon", 'd', POPT_ARG_NONE, &config.daemon, 0,

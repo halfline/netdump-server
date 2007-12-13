@@ -1,0 +1,110 @@
+--- netdump-0.7.16/configuration.h.orig	2007-03-09 11:49:57.000000000 -0500
++++ netdump-0.7.16/configuration.h	2007-03-09 11:50:07.000000000 -0500
+@@ -14,6 +14,7 @@ typedef struct {
+   char *compress;
+   int skip_zero;
+   int debug;
++  int verbose;
+   char *dir_prefix;
+ } NetdumpConfiguration;
+ 
+--- netdump-0.7.16/netdumpclient.c.orig	2007-03-09 11:47:54.000000000 -0500
++++ netdump-0.7.16/netdumpclient.c	2007-03-09 11:49:11.000000000 -0500
+@@ -187,6 +187,11 @@ netdump_client_destroy (NetdumpClient *c
+   int i;
+   char *compress_func, *compress_command = NULL;
+ 
++  /* Log netdump-server status */
++  if (config_verbose())
++    {
++      syslog (LOG_INFO, "   server rebooting %s.\n", client->ip_addr);
++    }
+ #ifdef DEBUG
+   g_print (" netdump_client_destroy(%p, reboot=%d)\n", client, reboot);
+ #endif
+@@ -982,6 +987,12 @@ memory_request (NetdumpClient *client, g
+ 
+       g_free (file);
+ 
++      /* Log netdump-server status */
++      if (config_verbose())
++      {
++        syslog (LOG_INFO, "   server generating elf header for %s.", client->ip_addr);
++      }
++
+       switch (client->machine_type)
+       {
+       case EM_386:
+@@ -1076,9 +1087,22 @@ memory_request (NetdumpClient *client, g
+ 	}
+     }
+ 
++    /* Log netdump-server status */
++    if (config_verbose() && client->current_page % (guint32)(client->nr_pages / 10) == 0)
++    {
++        syslog (LOG_INFO, "   server received %d0%% of pages from %s.\n", \
++            (int)(client->current_page / (guint32)(client->nr_pages / 10)), client->ip_addr);
++    }
++
+   /* Did we finish dumping all memory */
+   if ((client->current_page == client->nr_pages) && !has_active)
+     {
++      /* Log netdump-server status */
++      if (config_verbose())
++      {
++          syslog (LOG_INFO, "   server creating /vmcore for %s.\n", client->ip_addr);
++      }
++
+       char *old_file;
+       char *new_file;
+       
+@@ -1177,6 +1201,12 @@ memory_packet (NetdumpClient *client,
+   gboolean done;
+   int offset;
+ 
++  /* Log netdump-server status */
++  if (config_verbose())
++    {
++      syslog (LOG_INFO, "   server handling status information from %s\n", client->ip_addr);
++    }
++
+   if (parse_packet (buffer, buf_len, &reply))
+     {
+       syslog (LOG_WARNING, "Got invalid packet from %s\n", client->ip_addr);
+--- netdump-0.7.16/server.c.orig	2007-03-09 11:47:54.000000000 -0500
++++ netdump-0.7.16/server.c	2007-03-09 11:49:11.000000000 -0500
+@@ -536,6 +536,13 @@ config_debug_level(void)
+         return config.debug;
+ }
+ 
++
++int
++config_verbose(void)
++{
++        return config.verbose;
++}
++
+ int
+ config_load_segments(NetdumpClient *client)
+ {
+--- netdump-0.7.16/configuration.c.orig	2007-03-09 11:47:54.000000000 -0500
++++ netdump-0.7.16/configuration.c	2007-03-09 11:49:11.000000000 -0500
+@@ -301,6 +301,8 @@ static struct poptOption optionsTable[] 
+       "skip zero-filled pages in vmcore file", "1" },
+     { "debug", 'D', POPT_ARG_INT, &config.debug, 0,
+       "debug level", "0" },
++    { "verbose", 'v', POPT_ARG_INT, &config.verbose, 0,
++      "verbose output", "0" },
+       POPT_AUTOHELP
+     { NULL, 0, 0, NULL, 0 }
+ };
+--- netdump-0.7.16/server.h.orig	2005-10-03 15:07:29.000000000 -0400
++++ netdump-0.7.16/server.h	2007-03-09 11:49:11.000000000 -0500
+@@ -21,6 +21,7 @@ gboolean perform_space_check (void);
+ int config_load_segments(NetdumpClient *client);
+ int config_hole_size(void);
+ int config_debug_level(void);
++int config_verbose(void);
+ char *config_compress(void);
+ int config_skip_zero(void);
+ 

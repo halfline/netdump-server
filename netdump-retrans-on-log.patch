@@ -1,0 +1,20 @@
+--- netdump-0.7.16/netdumpclient.c.orig	2007-02-26 14:44:48.000000000 -0500
++++ netdump-0.7.16/netdumpclient.c	2007-02-26 14:55:42.000000000 -0500
+@@ -2471,8 +2471,15 @@ status_timeout (NetdumpClient *client,
+     status_request (client, FALSE);
+   else
+     {
+-      syslog (LOG_WARNING, "Got too many timeouts waiting for SHOW_STATUS for client %s, rebooting it\n", client->ip_addr);
+-      netdump_client_destroy (client, TRUE);
++	if (client->got_log_packet) {
++		/* keep trying if we are getting log messages */
++		client->got_log_packet = FALSE;
++		client->process_packet = status_packet;  /* may not be necessary */
++		client->timeout = status_timeout;  /* may not be necessary */
++      	} else {
++	      syslog (LOG_WARNING, "Got too many timeouts waiting for SHOW_STATUS for client %s, rebooting it\n", client->ip_addr);
++	      netdump_client_destroy (client, TRUE);
++	}
+     }
+ }
+ 

@@ -1,0 +1,11 @@
+--- netdump-0.7.16/netdump.init.orig	2006-06-20 15:28:46.000000000 -0400
++++ netdump-0.7.16/netdump.init	2006-06-20 15:30:19.000000000 -0400
+@@ -294,7 +294,7 @@ start ()
+ 	    else
+ 		IPADDR="$NETLOGADDR"
+ 	    fi
+-	    NETLOGOPTS="netlog=@$LOCALDDR/$DEV,$NETLOGPORT@$IPADDR/$NETLOGMACADDR "
++	    NETLOGOPTS="netlog=@$LOCALADDR/$DEV,$NETLOGPORT@$IPADDR/$NETLOGMACADDR "
+ 	fi
+     fi
+ 

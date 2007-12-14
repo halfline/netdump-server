@@ -1,7 +1,7 @@
 Summary: Server for network kernel message logging and crash dumps
 Name: netdump-server
 Version: 0.7.16
-Release: 20%{dist}
+Release: 21%{dist}
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
@@ -45,7 +45,7 @@ contact it and then writes the oops log and a memory dump to
 %patch8 -p1
 
 %build
-export CFLAGS="%{optflags} %{?_smp_mflags} `glib-config --cflags`"; make
+export CFLAGS="%{optflags} `glib-config --cflags`"; make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -95,6 +95,9 @@ fi
 %doc COPYING
 
 %changelog
+* Fri Dec 14 2007 Neil Horman <nhorman@redhat.com> - 0.7.16-21
+- Updating build flags to properly pass smp flags
+
 * Wed Dec 12 2007 Neil Horman <nhorman@redhat.com> - 0.7.16-20
 - Fixing licensing issues to be unambiguously GPLv2
 

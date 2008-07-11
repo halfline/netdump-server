@@ -97,7 +97,7 @@ fi
 %doc COPYING
 
 %changelog
-* Fri July 11 2008 Neil Horman <nhorman@redhat.com> - 0.7.16-23
+* Fri Jul 11 2008 Neil Horman <nhorman@redhat.com> - 0.7.16-23
 - Respond to clients listening on ports other than 6666 (bz 454703)
 
 * Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 0.7.16-22

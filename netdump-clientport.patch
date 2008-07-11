@@ -1,0 +1,129 @@
+diff -up netdump-0.7.16/server.c.orig netdump-0.7.16/server.c
+--- netdump-0.7.16/server.c.orig	2008-07-11 15:07:58.000000000 -0400
++++ netdump-0.7.16/server.c	2008-07-11 15:18:17.000000000 -0400
+@@ -224,7 +224,7 @@ load_magic (guint32 ip, guchar magic[MAG
+ 
+ 
+ static void
+-handle_new_client (guint32 ip, guchar *magic, reply_t *reply, char *msg)
++handle_new_client (guint32 ip, guint16 port, guchar *magic, reply_t *reply, char *msg)
+ {
+   NetdumpClient *client;
+   const char *dir;
+@@ -253,7 +253,7 @@ handle_new_client (guint32 ip, guchar *m
+ 	  just_reboot = TRUE;
+ 	}
+ 
+-      client = netdump_client_new (ip, dir, (char *)magic, just_reboot, reply, msg);
++      client = netdump_client_new (ip, port, dir, (char *)magic, just_reboot, reply, msg);
+       g_hash_table_insert (clients, client, client);
+     }
+ }
+@@ -309,6 +309,7 @@ master_socket_packet (GIOChannel  *chann
+   int len;
+   struct sockaddr_in addr;
+   int addr_len = sizeof(addr);
++  guint16 port;
+   
+   int fd = g_io_channel_unix_get_fd (channel);
+ 
+@@ -321,6 +322,7 @@ master_socket_packet (GIOChannel  *chann
+     }
+   
+   key.ip = ntohl (addr.sin_addr.s_addr);
++  port = ntohs (addr.sin_port);
+ #if 0
+   g_print ("got packet from %d.%d.%d.%d\n",
+ 	   (key.ip >> 24) & 0xff,
+@@ -363,7 +365,7 @@ master_socket_packet (GIOChannel  *chann
+ 
+       if (ntohl (reply.code) == REPLY_START_NETDUMP)
+ 	{
+-	  handle_new_client (key.ip, magic, &reply, (char *)&buf[HEADER_LEN]);
++	  handle_new_client (key.ip, port, magic, &reply, (char *)&buf[HEADER_LEN]);
+ 	}
+       else if (ntohl (reply.code) == REPLY_LOG)
+ 	{
+diff -up netdump-0.7.16/netdumpclient.c.orig netdump-0.7.16/netdumpclient.c
+--- netdump-0.7.16/netdumpclient.c.orig	2008-07-11 15:07:58.000000000 -0400
++++ netdump-0.7.16/netdumpclient.c	2008-07-11 15:18:17.000000000 -0400
+@@ -132,6 +132,7 @@ clear_do_print(void)
+ 
+ typedef struct {
+   guint32 ip;
++  guint16 port;
+   int count;
+   unsigned char magic_value[MAGIC_SIZE];
+ } RebootRequest;
+@@ -155,7 +156,7 @@ netdump_client_send_reboot (gpointer dat
+   
+   memset (&addr, 0, sizeof (addr));
+   addr.sin_family = AF_INET;
+-  addr.sin_port = htons(NETDUMP_PORT);
++  addr.sin_port = htons(reboot->port);
+   addr.sin_addr.s_addr = htonl(reboot->ip);
+   
+   memset (&req, 0, sizeof(req));
+@@ -197,6 +198,7 @@ netdump_client_reboot (NetdumpClient *cl
+   reboot = g_new0 (RebootRequest, 1);
+   
+   reboot->ip = client->ip;
++  reboot->port = client->port;
+   memcpy (reboot->magic_value, client->magic_value, MAGIC_SIZE);
+   reboot->count = 0;
+       
+@@ -375,7 +377,7 @@ netdump_client_send_request (NetdumpClie
+   
+   memset (&addr, 0, sizeof (addr));
+   addr.sin_family = AF_INET;
+-  addr.sin_port = htons(NETDUMP_PORT);
++  addr.sin_port = htons(client->port);
+   addr.sin_addr.s_addr = htonl(client->ip);
+   
+   memset (&req, 0, sizeof(req));
+@@ -412,6 +414,7 @@ netdump_client_send_request (NetdumpClie
+ 
+ NetdumpClient *
+ netdump_client_new (guint32     ip,
++		    guint16	port,
+ 		    const char *dir,
+ 		    const char  magic[MAGIC_SIZE],
+ 		    gboolean    just_reboot,
+@@ -426,15 +429,17 @@ netdump_client_new (guint32     ip,
+   client = g_new0 (NetdumpClient, 1);
+ 
+ #ifdef DEBUG
+-  g_print (" netdump_client_new() ip: %d.%d.%d.%d -> %p\n",
++  g_print (" netdump_client_new() ip: %d.%d.%d.%d:%d -> %p\n",
+ 	   (ip >> 24) & 0xff,
+ 	   (ip >> 16) & 0xff,
+ 	   (ip >> 8) & 0xff,
+ 	   (ip) & 0xff,
++	   port,
+ 	   client);
+ #endif
+ 
+   client->ip = ip;
++  client->port = port;
+   sprintf((char *)client->ip_addr, "%d.%d.%d.%d",
+ 	(ip >> 24) & 0xff,
+         (ip >> 16) & 0xff,
+diff -up netdump-0.7.16/netdumpclient.h.orig netdump-0.7.16/netdumpclient.h
+--- netdump-0.7.16/netdumpclient.h.orig	2007-12-12 11:19:53.000000000 -0500
++++ netdump-0.7.16/netdumpclient.h	2008-07-11 15:18:17.000000000 -0400
+@@ -46,6 +46,7 @@ typedef struct {
+ 
+ struct _NetdumpClient {
+   guint32 ip;
++  guint16 port;
+   gboolean just_reboot;
+   
+   guint32 outstanding_request;
+@@ -106,6 +107,7 @@ struct _NetdumpClient {
+ 
+ 
+ NetdumpClient *netdump_client_new     (guint32        ip,
++				       guint16        port,
+ 				       const char    *dir,
+ 				       const char     magic[MAGIC_SIZE],
+ 				       gboolean       just_reboot,

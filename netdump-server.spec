@@ -1,7 +1,7 @@
 Summary: Server for network kernel message logging and crash dumps
 Name: netdump-server
 Version: 0.7.16
-Release: 27%{dist}
+Release: 28%{dist}
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
@@ -25,6 +25,7 @@ Patch6: netdump-makefile-servonly.patch
 Patch7: netdump-server-Makefile.patch
 Patch8: netdump-server-init.patch
 Patch9: netdump-clientport.patch
+Patch10: netdump-server-use-ip-cmd.patch
 
 Group: System Environment/Daemons
 
@@ -45,6 +46,7 @@ contact it and then writes the oops log and a memory dump to
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
+%patch10 -p1
 
 %build
 export CFLAGS="%{optflags} `glib-config --cflags`"; make %{?_smp_mflags}
@@ -97,6 +99,9 @@ fi
 %doc COPYING
 
 %changelog
+* Fri Jan 27 2012 Neil Horman <nhorman@redhat.com> - 0.7.16-28
+- Swapped use of ip for ifconfig (bz 784923)
+
 * Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.16-27
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 

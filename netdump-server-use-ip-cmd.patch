@@ -1,0 +1,36 @@
+diff -up netdump-0.7.16/netdump.init.orig netdump-0.7.16/netdump.init
+--- netdump-0.7.16/netdump.init.orig	2012-01-27 08:35:12.282866759 -0500
++++ netdump-0.7.16/netdump.init	2012-01-27 08:35:32.121405853 -0500
+@@ -132,22 +132,16 @@ print_address_info ()
+     arping -c 1 -I $DEV $mac_ip &> /dev/null
+     [ $? -ne 0 ] && echo "$prog: cannot arp $mac_ip on $DEV" 1>&2
+ 
+-    # output from arp -a of the form:
+-    # good: host.domain (A.B.C.D) at 00:50:BF:06:48:C1 [ether] on eth0
+-    #           1           2      3         4            5     6   7
+-    # bad:  ? (A.B.C.D) at <incomplete> on eth0
+-    arp_output="$(LC_ALL=C arp -a | grep -v incomplete)"
+-    echo "$arp_output" | ( while read hostname ipaddr at mac iftype on iface;
+-    do
+-	: echo hostname=$hostname ipaddr=$ipaddr at=$at mac=$mac iftype=$iftype
+-	: echo on=$on iface=$iface
+-        if [ "$ipaddr" = "($mac_ip)" ] || expr "$hostname" : "$host" &>/dev/null;
+-	then
+-            echo HOSTNAME=$host IPADDR=$host_ip AT=$at MAC=$mac \
+-                 TYPE=$iftype ON=$on IFACE=$iface
+-	    exit 0
++    # output from ip -4 neigh of the form:
++    # good: A.B.C.D dev eth0 lladdr 00:50:bf:06:48:c1 REACHABLE
++    #          1     2   3     4            5             6   
++    # bad:  A.B.C.D dev eth0 FAILED
++    arp_output="$(LC_ALL=C ip -4 neigh show to $mac_ip | grep lladdr)"
++    echo "$arp_output" | ( read ipaddr dev iface lladdr mac state;
++        if [ -n "${iface}" ] && [ -n "${mac}" ]; then
++            echo IPADDR=$host_ip IFACE=$iface MAC=$mac
++            exit 0
+         fi
+-    done
+     exit 1 )
+ 
+     if [ $? -eq 1 ]; then
+ 

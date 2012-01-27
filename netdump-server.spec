@@ -1,7 +1,7 @@
 Summary: Server for network kernel message logging and crash dumps
 Name: netdump-server
 Version: 0.7.16
-Release: 28%{dist}
+Release: 29%{dist}
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
@@ -11,7 +11,7 @@ License: GPLv2
 Group: System Environment/Daemons
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX) 
 BuildRequires: glib-devel popt-devel
-Requires: /usr/bin/ssh-keygen /usr/bin/ssh fileutils textutils gawk /sbin/ifconfig
+Requires: /usr/bin/ssh-keygen /usr/bin/ssh fileutils textutils gawk
 Requires(pre): shadow-utils
 Requires(postun): /sbin/service
 
@@ -99,6 +99,9 @@ fi
 %doc COPYING
 
 %changelog
+* Fri Jan 27 2012 Neil Horman <nhorman@redhat.com> - 0.7.16-29
+- Removing unneeed Requires on ifconfig (bz 784923)
+
 * Fri Jan 27 2012 Neil Horman <nhorman@redhat.com> - 0.7.16-28
 - Swapped use of ip for ifconfig (bz 784923)
 

@@ -1,6 +1,6 @@
 diff -up netdump-0.7.16/netdump.init.orig netdump-0.7.16/netdump.init
---- netdump-0.7.16/netdump.init.orig	2012-01-27 08:35:12.282866759 -0500
-+++ netdump-0.7.16/netdump.init	2012-01-27 08:35:32.121405853 -0500
+--- netdump-0.7.16/netdump.init.orig	2012-01-27 11:24:01.652755130 -0500
++++ netdump-0.7.16/netdump.init	2012-01-27 11:26:06.528086846 -0500
 @@ -132,22 +132,16 @@ print_address_info ()
      arping -c 1 -I $DEV $mac_ip &> /dev/null
      [ $? -ne 0 ] && echo "$prog: cannot arp $mac_ip on $DEV" 1>&2
@@ -33,4 +33,12 @@ diff -up netdump-0.7.16/netdump.init.orig netdump-0.7.16/netdump.init
      exit 1 )
  
      if [ $? -eq 1 ]; then
+@@ -163,7 +157,7 @@ random_hex_int ()
  
+ ip_of_device ()
+ {
+-    LC_ALL=C /sbin/ifconfig $1 | sed 's/:/ /' | awk '/inet addr/ {print $3}'
++    LC_ALL=C ip $1 | awk '/inet/ {print $2}' | sed -e's/\/.*$//'
+ }
+ 
+ netdump_failure ()

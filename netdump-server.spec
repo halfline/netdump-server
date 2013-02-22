@@ -1,19 +1,24 @@
 Summary: Server for network kernel message logging and crash dumps
 Name: netdump-server
 Version: 0.7.16
-Release: 31%{dist}
+Release: 32%{dist}
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
 Source0: netdump-%{version}.tar.gz
 Source1: netdump-server.sysconfig
+Source2: netdump-server.service
+
 License: GPLv2
 Group: System Environment/Daemons
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX) 
 BuildRequires: glib-devel popt-devel
+BuildRequires: systemd-units
 Requires: /usr/bin/ssh-keygen /usr/bin/ssh fileutils textutils gawk
 Requires(pre): shadow-utils
-Requires(postun): /sbin/service
+Requires(post): systemd-units
+Requires(postun):systemd-units
+Requires(preun):systemd-units
 
 Patch0: netdump-init-typo.patch
 Patch1: netdump-localport-option.patch 
@@ -26,6 +31,7 @@ Patch7: netdump-server-Makefile.patch
 Patch8: netdump-server-init.patch
 Patch9: netdump-clientport.patch
 Patch10: netdump-server-use-ip-cmd.patch
+Patch11: netdump-server-default-dir.patch
 
 Group: System Environment/Daemons
 
@@ -47,6 +53,7 @@ contact it and then writes the oops log and a memory dump to
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+%patch11 -p1
 
 %build
 export CFLAGS="%{optflags} `glib-config --cflags`"; make %{?_smp_mflags}
@@ -57,7 +64,8 @@ mkdir -p $RPM_BUILD_ROOT
 DESTDIR=$RPM_BUILD_ROOT make install
 mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
 install -m 644 %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/netdump-server
-
+install -D -p -m 0644 %{SOURCE2} $RPM_BUILD_ROOT/%{_unitdir}/netdump-server.service
+mkdir -p $RPM_BUILD_ROOT/var/netdump/crash/netdump
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -70,19 +78,13 @@ useradd -r -u 34 -g netdump -d /var/netdump/crash/netdump -s /bin/bash \
 exit 0
 
 %post
-/sbin/chkconfig --add netdump-server
+%systemd_post netdump-server.service
 
 %postun
-if [ $1 -ge 1 ]; then
-	service netdump-server condrestart > /dev/null 2>&1
-fi
+%systemd_postun_with_restart netdump-server.service
 
 %preun
-if [ $1 = 0 ]; then
-	/sbin/service netdump-server stop > /dev/null 2>&1
-	/sbin/chkconfig --del netdump-server
-fi
-
+%systemd_preun netdump-server.service
 
 %files
 %defattr(-,root,root)
@@ -93,12 +95,18 @@ fi
 %config(noreplace) %attr(0600,netdump,netdump)/var/netdump/crash/.ssh/authorized_keys2
 %dir %attr(0700,netdump,netdump)/var/netdump/crash/magic
 %dir %attr(-,netdump,netdump)/var/netdump/crash/scripts
+%dir %attr(-,netdump,netdump)/var/netdump/crash/netdump
 /etc/rc.d/init.d/netdump-server
+%{_unitdir}/netdump-server.service
+
 %{_mandir}/man8/netdump-server.8*
 %doc README
 %doc COPYING
 
 %changelog
+* Fri Feb 22 2013 Neil Horman <nhorman@redhat.com> - 0.7.16-32
+- Updated to use service script for systemd (bz 914748)
+
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.16-31
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 

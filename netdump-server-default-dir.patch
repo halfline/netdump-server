@@ -1,0 +1,12 @@
+diff -up ./server.h.orig ./server.h
+--- ./server.h.orig	2013-02-22 13:14:37.507882723 -0500
++++ ./server.h	2013-02-22 13:14:47.105144781 -0500
+@@ -29,7 +29,7 @@
+ 
+ #define NETDUMP_PORT 6666
+ 
+-#define NETDUMP_DIR_PREFIX "/var/crash"
++#define NETDUMP_DIR_PREFIX "/var/netdump/crash"
+ 
+ extern int master_socket;
+ 

@@ -1,0 +1,12 @@
+[Unit]
+Description=Netdump Server
+Documentation=man:netdump-server(8)
+After=network.target
+
+[Service]
+User=netdump
+EnvironmentFile=/etc/sysconfig/netdump-server
+ExecStart=/usr/sbin/netdump-server $SERVER_OPTS
+
+[Install]
+WantedBy=multi-user.target

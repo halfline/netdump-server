@@ -1,0 +1,11 @@
+diff -up netdump-0.7.16/Makefile.orig netdump-0.7.16/Makefile
+--- netdump-0.7.16/Makefile.orig	2013-04-22 15:07:19.490639334 -0400
++++ netdump-0.7.16/Makefile	2013-04-22 15:07:28.461889035 -0400
+@@ -1,6 +1,6 @@
+ DEBUG_FLAGS=-Wall -g
+ 
+-LDFLAGS=`glib-config --libs` -lpopt
++LDFLAGS+=`glib-config --libs` -lpopt
+ 
+ VERSION=$(shell awk '/Version:/ { print $$2 }' netdump.spec)
+ # Used to append this to CVSTAG: _$(subst .,-,$(RELEASE)), but now that

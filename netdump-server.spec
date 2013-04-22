@@ -1,7 +1,7 @@
 Summary: Server for network kernel message logging and crash dumps
 Name: netdump-server
 Version: 0.7.16
-Release: 32%{dist}
+Release: 33%{dist}
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
@@ -32,6 +32,7 @@ Patch8: netdump-server-init.patch
 Patch9: netdump-clientport.patch
 Patch10: netdump-server-use-ip-cmd.patch
 Patch11: netdump-server-default-dir.patch
+Patch12: netdump-ldflags.patch
 
 Group: System Environment/Daemons
 
@@ -54,9 +55,12 @@ contact it and then writes the oops log and a memory dump to
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
+%patch12 -p1
 
 %build
-export CFLAGS="%{optflags} `glib-config --cflags`"; make %{?_smp_mflags}
+export CFLAGS="%{optflags} `glib-config --cflags` -fPIE"
+export LDFLAGS="-pie"
+make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -104,6 +108,9 @@ exit 0
 %doc COPYING
 
 %changelog
+* Mon Apr 22 2013 Neil Horman <nhorman@redhat.com> - 0.7.16-33
+- Updated to build netdump-server with -pie
+
 * Fri Feb 22 2013 Neil Horman <nhorman@redhat.com> - 0.7.16-32
 - Updated to use service script for systemd (bz 914748)
 

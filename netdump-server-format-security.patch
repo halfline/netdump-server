@@ -1,0 +1,44 @@
+diff -up ./server.c.orig ./server.c
+--- ./server.c.orig	2013-12-03 13:09:47.503514123 -0500
++++ ./server.c	2013-12-03 13:09:42.419477970 -0500
+@@ -102,9 +102,8 @@ get_dir_from_ip (guint32 ip, gboolean cr
+       res = mkdir(dir->path, S_IRWXU);
+       if (res)
+ 	{
+-	  char *msg = g_strdup_printf ("Error making crashdump directory %s", dir->path);
+-	  syslog (LOG_ERR, msg);
+-	  g_free (msg);
++	  syslog (LOG_ERR, "Error making crashdump directory %s",
++		  dir->path);
+ 	  g_free (dir->path);
+ 	  g_free (dir);
+ 	  return NULL;
+@@ -245,11 +244,10 @@ handle_new_client (guint32 ip, guint16 p
+       if (!just_reboot &&
+ 	  (g_hash_table_size (clients) > config.max_concurrent_dumps))
+ 	{
+-	  char *msg = g_strdup_printf ("Too many concurrent netdumps, ignoring dump request from %d.%d.%d.%d\n",
+-				       (ip >> 24) & 0xff, (ip >> 16) & 0xff,
+-				       (ip >> 8) & 0xff, (ip >> 0) & 0xff);
+-	  syslog (LOG_WARNING, msg);
+-	  g_free (msg);
++	  syslog (LOG_WARNING, "Too many concurrent netdumps, ignoring dump "
++				"from %d.%d.%d.%d\n",
++				(ip >> 24) & 0xff, (ip >> 16) & 0xff,
++				(ip >> 8) & 0xff, (ip >> 0) & 0xff);
+ 	  just_reboot = TRUE;
+ 	}
+ 
+@@ -490,10 +488,8 @@ main (int argc, char *argv[])
+ 	    (struct sockaddr *) &saddr,
+ 	    sizeof (saddr)) < 0)
+     {
+-      str = g_strdup_printf ("Couldn't bind master socket to %s:%d",
+-                        !config.addr ? "any" : config.addr, config.port);
+-      syslog (LOG_ERR, str);
+-      g_free (str);
++      syslog (LOG_ERR, "Couldn't bind master socket to %s:%d",
++			!config.addr ? "any" : config.addr, config.port);
+       exit (1);
+     }
+ 

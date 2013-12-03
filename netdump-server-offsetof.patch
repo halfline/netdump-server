@@ -1,0 +1,11 @@
+diff -up ./configuration.c.orig ./configuration.c
+--- ./configuration.c.orig	2013-12-03 13:23:07.978157640 -0500
++++ ./configuration.c	2013-12-03 13:27:28.541048858 -0500
+@@ -20,6 +20,7 @@
+  *			Elliot Le
+  *			Neil Horman 
+  ******************************************************************************/
++#include <stddef.h>
+ #include <glib.h>
+ #include <string.h>
+ #include <unistd.h>

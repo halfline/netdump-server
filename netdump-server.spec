@@ -1,7 +1,7 @@
 Summary: Server for network kernel message logging and crash dumps
 Name: netdump-server
 Version: 0.7.16
-Release: 34%{dist}
+Release: 35%{dist}
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
@@ -33,6 +33,8 @@ Patch9: netdump-clientport.patch
 Patch10: netdump-server-use-ip-cmd.patch
 Patch11: netdump-server-default-dir.patch
 Patch12: netdump-ldflags.patch
+Patch13: netdump-server-format-security.patch
+Patch14: netdump-server-offsetof.patch
 
 Group: System Environment/Daemons
 
@@ -56,6 +58,8 @@ contact it and then writes the oops log and a memory dump to
 %patch10 -p1
 %patch11 -p1
 %patch12 -p1
+%patch13 -p1
+%patch14 -p1
 
 %build
 export CFLAGS="%{optflags} `glib-config --cflags` -fPIE"
@@ -108,6 +112,10 @@ exit 0
 %doc COPYING
 
 %changelog
+* Tue Dec 03 2013 Neil Horman <nhorman@redhat.com> - 0.7.16-35
+- Fix build breaks with -Werror=format-security flag (bz 1037214)
+- Fix missing offsetof definition
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.16-34
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 

@@ -1,7 +1,7 @@
 Summary: Server for network kernel message logging and crash dumps
 Name: netdump-server
 Version: 0.7.16
-Release: 37%{dist}
+Release: 38%{dist}
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
@@ -74,6 +74,11 @@ mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
 install -m 644 %{SOURCE1} $RPM_BUILD_ROOT/etc/sysconfig/netdump-server
 install -D -p -m 0644 %{SOURCE2} $RPM_BUILD_ROOT/%{_unitdir}/netdump-server.service
 mkdir -p $RPM_BUILD_ROOT/var/netdump/crash/netdump
+
+%if 0%{?fedora} >= 23
+rm -rf $RPM_BUILD_ROOT/etc/rc.d
+%endif
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -104,7 +109,9 @@ exit 0
 %dir %attr(0700,netdump,netdump)/var/netdump/crash/magic
 %dir %attr(-,netdump,netdump)/var/netdump/crash/scripts
 %dir %attr(-,netdump,netdump)/var/netdump/crash/netdump
+%if 0%{??fedora} < 23
 /etc/rc.d/init.d/netdump-server
+%endif
 %{_unitdir}/netdump-server.service
 
 %{_mandir}/man8/netdump-server.8*
@@ -112,6 +119,9 @@ exit 0
 %doc COPYING
 
 %changelog
+* Wed Mar 18 2015 Adam Jackson <ajax@redhat.com> 0.7.16-38
+- Drop sysvinit script from F23+
+
 * Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.16-37
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 

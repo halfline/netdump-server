@@ -1,0 +1,21 @@
+Index: netdump-0.7.16/netdumpelf.h
+===================================================================
+--- netdump-0.7.16.orig/netdumpelf.h
++++ netdump-0.7.16/netdumpelf.h
+@@ -86,6 +86,7 @@ struct elf_prstatus
+ 
+ #endif  /* LEGACY_UNUSED */
+ 
++#ifndef _SYS_PROCFS_H
+ #define ELF_PRARGSZ	(80)	/* Number of chars for args */
+ 
+ struct elf_prpsinfo
+@@ -102,7 +103,7 @@ struct elf_prpsinfo
+ 	char	pr_fname[16];	/* filename of executable */
+ 	char	pr_psargs[ELF_PRARGSZ];	/* initial part of arg list */
+ };
+-
++#endif
+ /*
+  *  Host-platform independent data 
+  */

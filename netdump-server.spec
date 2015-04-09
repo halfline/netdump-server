@@ -1,7 +1,7 @@
 Summary: Server for network kernel message logging and crash dumps
 Name: netdump-server
 Version: 0.7.16
-Release: 38%{dist}
+Release: 39%{dist}
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
@@ -35,6 +35,7 @@ Patch11: netdump-server-default-dir.patch
 Patch12: netdump-ldflags.patch
 Patch13: netdump-server-format-security.patch
 Patch14: netdump-server-offsetof.patch
+Patch15: netdump-do-not-redeclare-procfs.patch
 
 Group: System Environment/Daemons
 
@@ -60,6 +61,7 @@ contact it and then writes the oops log and a memory dump to
 %patch12 -p1
 %patch13 -p1
 %patch14 -p1
+%patch15 -p1
 
 %build
 export CFLAGS="%{optflags} `glib-config --cflags` -fPIE"
@@ -119,6 +121,9 @@ exit 0
 %doc COPYING
 
 %changelog
+* Thu Apr 09 2015 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 0.7.16-39
+- Fix build on AArch64 (other chain of system headers than on x86)
+
 * Wed Mar 18 2015 Adam Jackson <ajax@redhat.com> 0.7.16-38
 - Drop sysvinit script from F23+
 

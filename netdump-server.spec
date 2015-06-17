@@ -1,7 +1,7 @@
 Summary: Server for network kernel message logging and crash dumps
 Name: netdump-server
 Version: 0.7.16
-Release: 39%{dist}
+Release: 40%{dist}
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
@@ -121,6 +121,9 @@ exit 0
 %doc COPYING
 
 %changelog
+* Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.16-40
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Thu Apr 09 2015 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 0.7.16-39
 - Fix build on AArch64 (other chain of system headers than on x86)
 

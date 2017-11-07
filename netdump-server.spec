@@ -13,12 +13,10 @@ License: GPLv2
 Group: System Environment/Daemons
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX) 
 BuildRequires: glib-devel popt-devel
-BuildRequires: systemd-units
+BuildRequires: systemd
 Requires: /usr/bin/ssh-keygen /usr/bin/ssh fileutils textutils gawk
 Requires(pre): shadow-utils
-Requires(post): systemd-units
-Requires(postun):systemd-units
-Requires(preun):systemd-units
+%{?systemd_requires}
 
 Patch0: netdump-init-typo.patch
 Patch1: netdump-localport-option.patch 

@@ -1,0 +1,45 @@
+diff -up netdump-0.7.16/Makefile.glib-2.0 netdump-0.7.16/Makefile
+--- netdump-0.7.16/Makefile.glib-2.0	2017-11-07 12:58:46.481663228 -0500
++++ netdump-0.7.16/Makefile	2017-11-07 13:00:01.726835546 -0500
+@@ -1,6 +1,7 @@
+ DEBUG_FLAGS=-Wall -g
+ 
+-LDFLAGS+=`glib-config --libs` -lpopt
++LDFLAGS+=`pkg-config --libs glib-2.0` -lpopt
++CFLAGS+=`pkg-config --cflags glib-2.0`
+ 
+ VERSION=$(shell awk '/Version:/ { print $$2 }' netdump.spec)
+ # Used to append this to CVSTAG: _$(subst .,-,$(RELEASE)), but now that
+diff -up netdump-0.7.16/server.c.glib-2.0 netdump-0.7.16/server.c
+--- netdump-0.7.16/server.c.glib-2.0	2017-11-07 13:03:00.988864599 -0500
++++ netdump-0.7.16/server.c	2017-11-07 13:03:19.396663067 -0500
+@@ -497,8 +497,8 @@ main (int argc, char *argv[])
+   g_io_add_watch (channel, G_IO_IN | G_IO_HUP, master_socket_packet, NULL);
+   g_io_channel_unref (channel);
+ 
+-  loop = g_main_new (TRUE);
+-  g_main_run (loop);
++  loop = g_main_loop_new (TRUE);
++  g_main_loop_run (loop);
+ 
+   return 0;
+ }
+diff -up netdump-0.7.16/configuration.c.glib-2.0 netdump-0.7.16/configuration.c
+--- netdump-0.7.16/configuration.c.glib-2.0	2017-11-07 13:04:48.563686850 -0500
++++ netdump-0.7.16/configuration.c	2017-11-07 13:07:16.579066349 -0500
+@@ -260,13 +260,11 @@ config_load (const char *filename)
+   scanner->input_name = filename;
+   scanner->msg_handler = msg_handler;
+     
+-  g_scanner_freeze_symbol_table(scanner);
+   for (i = 0; i < NUM_CONFIG_DATA; i++)
+     if (config_data[i].type != CONFIG_NONE) {
+-      g_scanner_add_symbol(scanner, config_data[i].name,
+-			   GINT_TO_POINTER(i));
++      g_scanner_scope_add_symbol(scanner, 0, config_data[i].name,
++				 GINT_TO_POINTER(i));
+     }
+-  g_scanner_thaw_symbol_table(scanner);
+   
+   while (1) {
+     if (g_scanner_peek_next_token(scanner) == G_TOKEN_EOF) {

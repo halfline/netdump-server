@@ -1,7 +1,7 @@
 Summary: Server for network kernel message logging and crash dumps
 Name: netdump-server
 Version: 0.7.16
-Release: 45%{dist}
+Release: 46%{dist}
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
@@ -12,7 +12,7 @@ Source2: netdump-server.service
 License: GPLv2
 Group: System Environment/Daemons
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX) 
-BuildRequires: glib-devel popt-devel
+BuildRequires: pkgconfig(glib-2.0) popt-devel
 BuildRequires: systemd
 Requires: /usr/bin/ssh-keygen /usr/bin/ssh gawk
 Requires(pre): shadow-utils
@@ -34,6 +34,7 @@ Patch12: netdump-ldflags.patch
 Patch13: netdump-server-format-security.patch
 Patch14: netdump-server-offsetof.patch
 Patch15: netdump-do-not-redeclare-procfs.patch
+Patch16: netdump-glib-2.0.patch
 
 Group: System Environment/Daemons
 
@@ -60,6 +61,7 @@ contact it and then writes the oops log and a memory dump to
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
+%patch16 -p1
 
 %build
 export CFLAGS="%{optflags} `glib-config --cflags` -fPIE"
@@ -119,6 +121,9 @@ exit 0
 %doc COPYING
 
 %changelog
+* Tue Nov 07 2017 Ray Strode <rstrode@redhat.com> - 0.7.16-46
+- Build against glib-2.0
+
 * Tue Nov 07 2017 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.7.16-45
 - Remove old crufty coreutils requires
 

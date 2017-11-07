@@ -1,7 +1,7 @@
 Summary: Server for network kernel message logging and crash dumps
 Name: netdump-server
 Version: 0.7.16
-Release: 44%{dist}
+Release: 45%{dist}
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
@@ -14,7 +14,7 @@ Group: System Environment/Daemons
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX) 
 BuildRequires: glib-devel popt-devel
 BuildRequires: systemd
-Requires: /usr/bin/ssh-keygen /usr/bin/ssh fileutils textutils gawk
+Requires: /usr/bin/ssh-keygen /usr/bin/ssh gawk
 Requires(pre): shadow-utils
 %{?systemd_requires}
 
@@ -119,6 +119,9 @@ exit 0
 %doc COPYING
 
 %changelog
+* Tue Nov 07 2017 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.7.16-45
+- Remove old crufty coreutils requires
+
 * Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.16-44
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
